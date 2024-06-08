@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry Pi Bluetooth Control</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Raspberry Pi Bluetooth Control</h1>
+    <button id="start-scan">Start Scanning</button>
+    <pre id="scan-output"></pre>
+    <form id="connect-form">
+        <label for="mac-address">Enter MAC address:</label>
+        <input type="text" id="mac-address" name="mac_address">
+        <button type="submit">Connect</button>
+    </form>
+    <script>
+        $(document).ready(function() {
+            $('#start-scan').click(function() {
+                $.post('/start_scan', function(data) {
+                    console.log(data);
+                });
+
+                setInterval(function() {
+                    $.get('/get_scan_output', function(data) {
+                        $('#scan-output').text(data.scan_output);
+                    });
+                }, 1000);
+            });
+
+            $('#connect-form').submit(function(event) {
+                event.preventDefault();
+                const macAddress = $('#mac-address').val();
+                $.post('/connect_device', {mac_address: macAddress}, function(data) {
+                    console.log(data);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
